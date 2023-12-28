@@ -1,32 +1,52 @@
 from github import Github
 from Entities.GitHubPullRequest import *
 from Libraries.utilities import *
+from Repositories.FileRepository import *
+
+import datetime
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+secret_filename = "/home/oliverbullock/Documents/secrets.txt"
+repo_filename = "/home/oliverbullock/Documents/repos.txt"
 
 # get the token from a secret file.
-pak = get_secret("/home/oliverbullock/Documents/secrets.txt")
+file = FileRepository(secret_filename)
+pak = file.read_lines()[0].strip()
 
 # First create a Github instance using an access token
 g = Github(pak)
 
 # Then get the specific repository
-repo_name = get_repos("/home/oliverbullock/Documents/repos.txt")
-repo = g.get_repo(repo_name)
+file = FileRepository(repo_filename)
+repos = file.read_lines()
 
-# Get all pull requests
-print("Getting [all] pull requests...")
-pulls = repo.get_pulls(state='all')
-
-# Create a new collection of GitHubPullRequest objects
+#create a new pull request collection
 pull_requests = []
 
-print("Creating GitHubPullRequest objects...")
-for pr in pulls:
-    pull_request = GitHubPullRequest(pr.id, pr.title, pr.body, pr.user, pr.created_at, pr.updated_at)
-    pull_requests.append(pull_request)
+repository_index = 0;
+repository_total = len(repos)
 
+for repo in repos:
+    repo = g.get_repo(repo)
+    logging.info(f" Getting [all] pull requests from repo {repo.name} [{repository_index}/{repository_total}]")
+    # print(f"{datetime.date} {datetime.time} Getting [all] pull requests from repo {repo.name}")
+    pulls = repo.get_pulls(state='all')
+
+    logging.info(f" Creating GitHubPullRequest objects for repo {repo.name} [{repository_index}/{repository_total}]")
+    # print(f"Creating GitHubPullRequest objects for repo {repo.name}")
+    for pr in pulls:
+        pull_request = GitHubPullRequest(pr.id, pr.title, pr.body, pr.user, pr.created_at, pr.updated_at, repo.name)
+        pull_requests.append(pull_request)
+
+    repository_index += 1
+    
 output_filename = "/home/oliverbullock/Documents/pull_requests.csv"
 
-print(f"Writing pull requests to file [{output_filename}]...")
+logging.info(f" Writing pull requests to file [{output_filename}]...")
+# print(f"Writing pull requests to file [{output_filename}]...")
 write_pull_requests_to_file(pull_requests, output_filename)
 
-print(f"Exported required git hub information to {output_filename}!")
+logging.info(f" Exported required git hub information to {output_filename}!")
+# print(f"Exported required git hub information to {output_filename}!")

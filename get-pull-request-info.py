@@ -13,16 +13,20 @@ repo_name = get_repos("/home/oliverbullock/Documents/repos.txt")
 repo = g.get_repo(repo_name)
 
 # Get all pull requests
-pulls = repo.get_pulls()
+print("Getting [all] pull requests...")
+pulls = repo.get_pulls(state='all')
 
 # Create a new collection of GitHubPullRequest objects
 pull_requests = []
 
+print("Creating GitHubPullRequest objects...")
 for pr in pulls:
     pull_request = GitHubPullRequest(pr.id, pr.title, pr.body, pr.user, pr.created_at, pr.updated_at)
     pull_requests.append(pull_request)
 
-write_pull_requests_to_file(pull_requests, "/home/oliverbullock/Documents/pull_requests.csv")
+output_filename = "/home/oliverbullock/Documents/pull_requests.csv"
 
-print("Done!")
+print(f"Writing pull requests to file [{output_filename}]...")
+write_pull_requests_to_file(pull_requests, output_filename)
 
+print(f"Exported required git hub information to {output_filename}!")

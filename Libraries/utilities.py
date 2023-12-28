@@ -8,9 +8,9 @@ def get_secret(filename):
 
 def write_pull_requests_to_file(pull_requests, filename):
     with open(filename, 'w') as file:
-        file.write("id, title, user, created_at, updated_at, body\n")
+        file.write("id, repository, title, user, created_at, updated_at,\n")
         for pr in pull_requests:
-            file.write(f"{pr.id}, {pr.title}, {pr.user.login}, {pr.created_at}, {pr.updated_at}, {pr.body,}\n")
+            file.write(f"{pr.id}, {pr.repo_name}, {pr.title}, {pr.user.login}, {pr.created_at}, {pr.updated_at},\n")
 
 def get_repos(filename):
     with open(filename, 'r') as repo_file:

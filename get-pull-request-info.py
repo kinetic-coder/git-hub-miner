@@ -31,22 +31,20 @@ repository_total = len(repos)
 for repo in repos:
     repo = g.get_repo(repo)
     logging.info(f" Getting [all] pull requests from repo {repo.name} [{repository_index}/{repository_total}]")
-    # print(f"{datetime.date} {datetime.time} Getting [all] pull requests from repo {repo.name}")
     pulls = repo.get_pulls(state='all')
 
     logging.info(f" Creating GitHubPullRequest objects for repo {repo.name} [{repository_index}/{repository_total}]")
-    # print(f"Creating GitHubPullRequest objects for repo {repo.name}")
     for pr in pulls:
-        pull_request = GitHubPullRequest(pr.id, pr.title, pr.body, pr.user, pr.created_at, pr.updated_at, repo.name)
+        jira_reference = parse_string_with_regex(pr.title, r"SBS-\d+")
+        pull_request = GitHubPullRequest(pr.id, pr.title, pr.body, pr.user, pr.created_at, pr.updated_at, repo.name, jira_reference)
         pull_requests.append(pull_request)
 
     repository_index += 1
     
-output_filename = "/home/oliverbullock/Documents/pull_requests.csv"
+output_filename = "/home/oliverbullock/git-hub-miner/pull_requests.csv"
 
 logging.info(f" Writing pull requests to file [{output_filename}]...")
-# print(f"Writing pull requests to file [{output_filename}]...")
+
 write_pull_requests_to_file(pull_requests, output_filename)
 
 logging.info(f" Exported required git hub information to {output_filename}!")
-# print(f"Exported required git hub information to {output_filename}!")

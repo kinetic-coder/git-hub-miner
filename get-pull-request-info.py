@@ -41,7 +41,7 @@ for repo in repos:
 
     repository_index += 1
     
-output_filename = "/home/oliverbullock/git-hub-miner/pull_requests.csv"
+output_filename = "/home/oliverbullock/Documents/pull_requests.csv"
 
 logging.info(f" Writing pull requests to file [{output_filename}]...")
 

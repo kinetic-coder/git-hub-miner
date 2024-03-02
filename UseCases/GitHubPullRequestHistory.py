@@ -7,7 +7,7 @@ from Repositories.FileRepository import *
 
 class GitHubUseCases:
 
-    def get_github_pull_requests():
+    def get_github_pull_requests(self):
         logging.basicConfig(level=logging.INFO)
 
         secret_filename = "/home/oliverbullock/Documents/secrets.txt"

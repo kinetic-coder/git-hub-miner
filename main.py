@@ -18,7 +18,8 @@ while True:
         print("Thank you for using git-hub-miner - Bye!!")
         break
     elif choice == "1":
-        GitHubUseCases.get_github_pull_requests()
+        gh = GitHubUseCases()
+        gh.get_github_pull_requests()
     elif choice == "2":
         print("Getting Jira information using jql")
     else:

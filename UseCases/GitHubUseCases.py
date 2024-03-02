@@ -7,12 +7,15 @@ from Repositories.FileRepository import *
 
 class GitHubUseCases:
 
+    
+
     def get_github_token(self):
         secret_filename = "/home/oliverbullock/Documents/secrets.txt"
 
         # get the token from a secret file.
         file = FileRepository(secret_filename)
         pak = file.read_lines()[0].strip()
+        return pak
 
     def get_github_repositories(self):
         repo_filename = "/home/oliverbullock/Documents/repos.txt"
@@ -24,7 +27,7 @@ class GitHubUseCases:
         with open(output_filename, 'w') as f:
             f.write("pull_request_id,review_id,user,state,submitted_at,body\n")
             for review in pr_reviews:
-                f.write(f"{review['pull_request_id']},{review['review_id']},{review['user']},{review['state']},{review['submitted_at']},{review['body']}\n")
+                f.write(f"{review['pull_request_ref']},{review['pull_request_id']},{review['review_id']},{review['user']},{review['state']},{review['submitted_at']},{review['body']}\n")
 
     def write_pr_reviews_to_file(self, pull_requests, output_filename):
         with open(output_filename, 'w') as f:
@@ -41,23 +44,23 @@ class GitHubUseCases:
         # First create a Github instance using an access token
         g = Github(pak)
 
-        repos = self.get_github_repositories()
+        repositorys = self.get_github_repositories()
 
         #create a new pull request collection
         pull_requests = []
 
         repository_index = 0
-        repository_total = len(repos)
+        repository_total = len(repositorys)
 
-        for repo in repos:
-            repo = g.get_repo(repo)
-            logging.info(f" Getting [all] pull requests from repo {repo.name} [{repository_index}/{repository_total}]")
-            pulls = repo.get_pulls(state='all')
+        for repository in repositorys:
+            gh_repo = g.get_repo(repository)
+            logging.info(f" Getting [all] pull requests from repo {gh_repo.name} [{repository_index}/{repository_total}]")
+            pulls = gh_repo.get_pulls(state='all')
 
-            logging.info(f" Creating GitHubPullRequest objects for repo {repo.name} [{repository_index}/{repository_total}]")
+            logging.info(f" Creating GitHubPullRequest objects for repo {gh_repo.name} [{repository_index}/{repository_total}]")
             for pr in pulls:
                 jira_reference = parse_string_with_regex(pr.title, r"SBS-\d+")
-                pull_request = GitHubPullRequest(pr.id, pr.title, pr.body, pr.user, pr.created_at, pr.updated_at, repo.name, jira_reference)
+                pull_request = GitHubPullRequest(pr.id, pr.title, pr.body, pr.user, pr.created_at, pr.updated_at, gh_repo.name, jira_reference)
                 pull_requests.append(pull_request)
 
             repository_index += 1
@@ -95,6 +98,7 @@ class GitHubUseCases:
                 reviews = pr.get_reviews()
                 for review in reviews:
                     pr_review = {
+                        'pull_request_ref': pr.number,
                         'pull_request_id': pr.id,
                         'review_id': review.id,
                         'user': review.user,
@@ -103,6 +107,8 @@ class GitHubUseCases:
                         'body': review.body
                     }
                     pr_reviews.append(pr_review)
+                    logging.info(f" +{pr_review['pull_request_ref']} in {repo_name} from {pr_review['user']} circa {pr_review['submitted_at']} [{repository_index}/{repository_total}]")
+                                 
             repository_index += 1
         
         output_filename = "/home/oliverbullock/Documents/pr_reviews.csv"

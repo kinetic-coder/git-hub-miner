@@ -4,6 +4,11 @@ This is an experimental application created using Git Hub Co-pilot to understand
 
 Typically, becoming comfortable using a new language can take months and months of learning. With GitHub Copilot, I would expect this to take less time to do.
 
+## Setup
+To run the application, you will require the following libraries that can be installed using PIP:
+
+* pip install PyGithub
+
 ## Where we are now?
 ### 2nd March 2024
 So far, my experiment has been interesting...

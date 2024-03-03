@@ -4,10 +4,9 @@ from github import Github
 from Entities.GitHubPullRequest import *
 from Libraries.utilities import *
 from Repositories.FileRepository import *
+from datetime import datetime
 
 class GitHubUseCases:
-
-    
 
     def get_github_token(self):
         secret_filename = "/home/oliverbullock/Documents/secrets.txt"
@@ -74,6 +73,10 @@ class GitHubUseCases:
         logging.info(f" Exported required git hub information to {output_filename}!")
         input("Press enter to continue...")
 
+    def get_reviews_for_pr(pr):
+        # Replace this with the actual code to fetch reviews for a pull request
+        pass
+
     # get the pull request reviews from Github and write to file
     def get_github_pr_reviews(self):
 
@@ -85,6 +88,9 @@ class GitHubUseCases:
         g = Github(pak)
 
         repos = self.get_github_repositories()
+        process_start_time = datetime.now()
+
+        number_interations_completed = 0
 
         # create a new pull request review collection
         pr_reviews = []
@@ -107,7 +113,8 @@ class GitHubUseCases:
                         'body': review.body
                     }
                     pr_reviews.append(pr_review)
-                    logging.info(f" +{pr_review['pull_request_ref']} in {repo_name} from {pr_review['user']} circa {pr_review['submitted_at']} [{repository_index}/{repository_total}]")
+                    number_interations_completed += 1
+                    logging.info(f" +{pr_review['pull_request_ref']} in {repo_name} [Started ({process_start_time}) ({number_interations_completed}) [{repository_index}/{repository_total}]")
                                  
             repository_index += 1
         
